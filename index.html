@@ -1109,6 +1109,31 @@ input,button{font-size:16px}
 /* no white on overscroll: canvas is blue, page content stays white */
 html{background:#2B3BFF!important;overscroll-behavior-y:auto}
 body::before{background:#2B3BFF!important}
+/* iOS Safari: no white status-bar strip; let the page show through */
+body::before{display:none!important}
+/* embedded app screens: no sticky elements (Safari tints its bars from them) */
+.dev .datefab,.dev .rx-fab,.dev [style*="sticky"]{position:absolute!important}
+.dev .datefab{bottom:14px}
+.dev .rx-fab{bottom:0;left:0;right:0;margin:0!important}
+/* mobile nav: one clean liquid-glass bar with a soft lower edge */
+@media (max-width:860px){
+  .nav::before{inset:0 0 -14px 0!important;box-shadow:none!important;
+    -webkit-mask:linear-gradient(180deg,#000 calc(100% - 14px),transparent);mask:linear-gradient(180deg,#000 calc(100% - 14px),transparent);
+    backdrop-filter:blur(22px) saturate(180%)!important;-webkit-backdrop-filter:blur(22px) saturate(180%)!important}
+  .nav.scrolled:not(.onlight)::before{background:rgba(43,59,255,.55)!important}
+  .nav.scrolled.onlight::before{background:rgba(255,255,255,.7)!important}
+}
+/* mobile: agent logos as one gently scrolling row instead of a long list */
+@media (max-width:700px){
+  .logos{padding-block:56px 48px;overflow:hidden;padding-inline:0!important}
+  .logos .cap{margin-bottom:24px;font-size:14px}
+  .logos ul{flex-wrap:nowrap;justify-content:flex-start;gap:36px;width:max-content;max-width:none;animation:lgm 28s linear infinite}
+  .logos li{font-size:17px;flex:none}.logos li svg{width:22px;height:22px}
+  .logos{-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+}
+@keyframes lgm{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.logos ul{animation:none}}
+@media (min-width:701px){.logos li[aria-hidden]{display:none}}
 
 .hcapp{--stage: #e8ebff; --stage-ink: #0b0d17; --stage-ink-2: #4a4c5c; --stage-panel: #ffffff; --stage-line: #d6dbf5; --ground: #f3f4fc; --surface: #ffffff; --surface-2: #f0f2ff; --line: #e3e6f6; --ink: #0b0d17; --ink-2: #4a4c5c; --ink-3: #6e7085; --brand: #2b3bff; --ok: #15724a; --ok-soft: #e1f4ea; --warn: #c9440d; --warn-soft: #ffe3d6; --bad: #be2f22; --bad-soft: #fbe6e3; --info: #2b3bff; --info-soft: #e8ebff; --g1: #d9faf3; --g2: #b3f0e6; --g3: #9ae4f3; --g4: #86ccf5; --g5: #5aaef2; --logo-grad: linear-gradient(180deg,var(--g1) 0%,var(--g2) 30%,var(--g3) 55%,var(--g4) 78%,var(--g5) 100%); --card-grad: linear-gradient(118deg,#f4f5ff 0%,#e8ebff 45%,#dde1ff 100%); --font: Figtree,-apple-system,"SF Pro Text",system-ui,sans-serif; color-scheme: light; box-sizing: border-box; padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px);}
 
@@ -2233,6 +2258,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
  new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting&&!run){run=true;cycle();} else if(!e.isIntersecting&&run){run=false;clear();w.classList.remove('open');} }),{threshold:.35}).observe(w);
 })();
 </script>
+<script>(()=>{const u=document.querySelector('.logos ul');if(u&&!u.dataset.dup){u.dataset.dup=1;[...u.children].forEach(li=>{const c=li.cloneNode(true);c.setAttribute('aria-hidden','true');u.appendChild(c)})}})();</script>
 <footer class="closing blue ft" id="join">
   <div class="ft-bands" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <div class="wrap ft-cta">
@@ -2339,7 +2365,7 @@ document.documentElement.classList.add('js');
       const wt=$('hsWaitTxt'); if(wt) wt.textContent=passed===4?'All rules passed':`Checking your rules… ${passed}/4`;
       
       const vh=innerHeight; par.forEach(e=>{ const d=+e.dataset.depth; e.style.transform=`translate3d(0,${(.5-p)*d*260}px,0)`; });
-      const hy=scrollY; head.style.transform=`translate3d(0,${hy*.35}px,0)`; hdo.forEach(e=>e.style.translate=`0 ${-hy*(+e.dataset.hd)}px`); head.style.opacity=Math.max(0,1-hy/(vh*.55));
+      const hy=scrollY; head.style.transform=mob?'none':`translate3d(0,${hy*.35}px,0)`; hdo.forEach(e=>e.style.translate=`0 ${-hy*(+e.dataset.hd)}px`); head.style.opacity=mob?1:Math.max(0,1-hy/(vh*.55));
       stg.parentElement.style.setProperty('--rise',(1-cl((-r.top+vh*.6)/(vh*.6)))*0);
     }
     size(); frame();
