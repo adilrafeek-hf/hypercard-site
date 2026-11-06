@@ -2309,6 +2309,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
 
 <script>
 /* Where sign-ups go. Paste your form endpoint here, e.g. "https://formspree.io/f/abcdwxyz". */
+/* build 2026-11-06-v6 */
 const WAITLIST_ENDPOINT = "https://formsubmit.co/ajax/hello@hypercard.in";
 document.documentElement.classList.add('js');
 
@@ -2459,16 +2460,10 @@ document.documentElement.classList.add('js');
         } else {
           const body=/formsubmit\.co/.test(WAITLIST_ENDPOINT)?Object.assign({_subject:'New Hypercard waitlist sign-up: '+entry.name,_template:'table',_captcha:'false',_replyto:entry.email},entry):entry;
           const ac=new AbortController(); const to=setTimeout(()=>ac.abort(),15000);
-          // simple CORS request (FormData, no custom content-type) → no preflight
+          // FormSubmit: plain form post, response not read (avoids all CORS issues)
           const fd=new FormData(); Object.entries(body).forEach(([k,v])=>fd.append(k,v));
-          let r;
-          try{ r=await fetch(WAITLIST_ENDPOINT,{method:'POST',headers:{'Accept':'application/json'},body:fd,signal:ac.signal}); }
-          catch(e){ if(e.name==='AbortError') throw e;
-            // response not readable cross-origin: send anyway as an opaque request
-            const fd2=new FormData(); Object.entries(body).forEach(([k,v])=>fd2.append(k,v));
-            await fetch(WAITLIST_ENDPOINT.replace('/ajax/','/'),{method:'POST',mode:'no-cors',body:fd2});
-            r=new Response('{}',{status:200}); }
-          finally{ clearTimeout(to); }
+          try{ await fetch(WAITLIST_ENDPOINT.replace('/ajax/','/'),{method:'POST',mode:'no-cors',body:fd,signal:ac.signal}); } finally{ clearTimeout(to); }
+          const r=new Response('{}',{status:200});
           let jr=null; try{ jr=await r.clone().json(); }catch(_){}
           const msgTxt=jr&&(jr.message||'');
           if(jr&&String(jr.success)==='false'&&!/activat/i.test(msgTxt)) { console.warn('Waitlist:',msgTxt); throw new Error('http'); }
