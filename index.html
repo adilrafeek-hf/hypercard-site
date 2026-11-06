@@ -2243,7 +2243,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
         <details class="rv"><summary>Is it free?</summary><div class="a">Yes. No joining fee, no annual fee.</div></details>
         <details class="rv"><summary>Is it a credit card?</summary><div class="a">No. It's prepaid, so agents can only spend what you've added.</div></details>
         <details class="rv"><summary>Which agents work with it?</summary><div class="a">Any agent that pays online with a card, like Instinct, Muse, Hermes and ChatGPT.</div></details>
-        <details class="rv"><summary>Where can I get it?</summary><div class="a">Hypercard is an app, coming soon to the App Store and Google Play. It launches in India first. Join the waitlist and we'll tell you when it's live.</div></details>
+        <details class="rv"><summary>Where can I get it?</summary><div class="a">Hypercard is an app, coming soon to the App Store and Google Play. It launches in India first. Join the waitlist and we'll tell you when it's live. Questions? Write to <a href="mailto:hello@hypercard.in">hello@hypercard.in</a>.</div></details>
       </div>
     </div>
   </section>
@@ -2286,7 +2286,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
       <div><h5>Legal</h5><ul><li><a href="/privacy">Privacy</a></li><li><a href="/terms">Terms</a></li></ul></div>
     </div>
   </div>
-  <div class="wrap ft-legal"><span>© 2026 Hypercard</span><span>Early access in India</span></div>
+  <div class="wrap ft-legal"><span>© 2026 Hypercard</span><span><a href="mailto:hello@hypercard.in" style="color:inherit">hello@hypercard.in</a> · Early access in India</span></div>
 </footer>
 
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
@@ -2309,7 +2309,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
 
 <script>
 /* Where sign-ups go. Paste your form endpoint here, e.g. "https://formspree.io/f/abcdwxyz". */
-const WAITLIST_ENDPOINT = "";
+const WAITLIST_ENDPOINT = "https://formsubmit.co/ajax/hello@hypercard.in";
 document.documentElement.classList.add('js');
 
 (function(){
@@ -2454,8 +2454,13 @@ document.documentElement.classList.add('js');
     btn.disabled=true; btn.textContent='Joining…';
     try{
       if(WAITLIST_ENDPOINT){
-        const r=await fetch(WAITLIST_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(entry)});
-        if(!r.ok) throw new Error('http');
+        if(/script\.google\.com/.test(WAITLIST_ENDPOINT)){
+          await fetch(WAITLIST_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(entry)});
+        } else {
+          const body=/formsubmit\.co/.test(WAITLIST_ENDPOINT)?Object.assign({_subject:'New Hypercard waitlist sign-up: '+entry.name,_template:'table',_captcha:'false',_replyto:entry.email},entry):entry;
+          const r=await fetch(WAITLIST_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(body)});
+          if(!r.ok) throw new Error('http');
+        }
       } else {
         const db=await dbReady; if(!db) throw new Error('nostore');
         await db.collection('waitlist').add(entry);
