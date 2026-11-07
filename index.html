@@ -2137,6 +2137,18 @@ main{background:#fff;position:relative}
 .done .tk{width:56px;height:56px;border-radius:50%;background:var(--mint);display:grid;place-items:center}
 .done .tk::after{content:"";width:20px;height:10px;border-left:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:rotate(-45deg) translate(2px,-2px)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+/* stable modal: above nav, fixed to the visible viewport, scroll locked */
+.modal{z-index:200;overscroll-behavior:contain;height:100vh;height:100dvh}
+html.modal-open{overflow:hidden}
+.sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+@media (max-width:600px){
+  .modal{place-items:end stretch;padding:0;padding-top:max(24px,env(safe-area-inset-top,0px))}
+  .sheet{max-width:none;max-height:100%;border-radius:28px 28px 0 0;padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));gap:14px;animation:sheetUp .35s cubic-bezier(.2,.8,.2,1)}
+  .sheet h3{font-size:26px}
+  .field input,.field select{min-height:46px}
+  .chips label{min-height:36px;padding:0 13px;font-size:14px}
+}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
 
 .muted{color:var(--ink-2)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -2519,6 +2531,17 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
  new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!run){run=true;cycle();}else if(!e.isIntersecting&&run){run=false;reset();}}),{threshold:.3}).observe(w);
 })();
 </script>
+<script>
+/* iOS 26 Safari tints its bars from <body>'s background: keep it in sync with the section at the top of the screen */
+(()=>{const R=document.documentElement,B=document.body;let last='',q=false;
+ const op=c=>{const m=c.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/);return !/transparent/.test(c)&&(!m||+m[1]>=.9)};
+ function colorAt(y){let e=document.elementFromPoint(innerWidth/2,y);while(e&&e!==R){if(e.closest&&e.closest('.nav,.modal')){e=e.closest('.nav,.modal').parentElement;continue}
+   const c=getComputedStyle(e);const bg=c.backgroundColor;if(c.backgroundImage&&c.backgroundImage!=='none'&&/gradient/.test(c.backgroundImage)){const m=c.backgroundImage.match(/rgba?\([^)]*\)|#[0-9a-f]{3,8}/i);if(m&&op(m[0]))return m[0]}
+   if(bg&&op(bg))return bg;e=e.parentElement}return '#ffffff'}
+ function upd(){q=false;const c=colorAt(2);if(c!==last){last=c;R.style.setProperty('background-color',c,'important');B.style.setProperty('background-color',c,'important');let m=document.querySelector('meta[name=theme-color]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}m.content=c}}
+ addEventListener('scroll',()=>{if(!q){q=true;requestAnimationFrame(upd)}},{passive:true});addEventListener('load',upd);setTimeout(upd,300);
+})();
+</script>
 <footer class="closing blue ft" id="join">
   <div class="ft-bands" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <div class="wrap ft-cta">
@@ -2564,7 +2587,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
 
 <script>
 /* Where sign-ups go. Paste your form endpoint here, e.g. "https://formspree.io/f/abcdwxyz". */
-console.info("Hypercard build v19");
+console.info("Hypercard build v21");
 const WAITLIST_ENDPOINT = "https://formsubmit.co/ajax/hello@hypercard.in";
 document.documentElement.classList.add('js');
 
@@ -2678,8 +2701,11 @@ document.documentElement.classList.add('js');
 
   const modal=$('modal'), form=$('waitlist'); let lastFocus=null;
   const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-  function openModal(email){ lastFocus=document.activeElement; if(email) $('email').value=email; modal.hidden=false; document.body.style.overflow='hidden'; setTimeout(()=>$('name').focus(),30); }
-  function closeModal(){ modal.hidden=true; document.body.style.overflow=''; lastFocus && lastFocus.focus && lastFocus.focus(); }
+  let scrollY0=0; const touch=matchMedia('(hover:none),(pointer:coarse)').matches;
+  function openModal(email){ lastFocus=document.activeElement; if(lastFocus&&lastFocus.blur) lastFocus.blur(); if(email) $('email').value=email;
+    scrollY0=window.scrollY; const b=document.body; b.style.position='fixed'; b.style.top=(-scrollY0)+'px'; b.style.left='0'; b.style.right='0'; b.style.width='100%'; document.documentElement.classList.add('modal-open');
+    modal.hidden=false; if(!touch) setTimeout(()=>$('name').focus(),30); }
+  function closeModal(){ modal.hidden=true; const b=document.body; b.style.position=''; b.style.top=''; b.style.left=''; b.style.right=''; b.style.width=''; document.documentElement.classList.remove('modal-open'); document.documentElement.style.scrollBehavior='auto'; window.scrollTo(0,scrollY0); document.documentElement.style.scrollBehavior=''; if(!touch) lastFocus && lastFocus.focus && lastFocus.focus(); }
   document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openModal('')));
   modal.addEventListener('click',e=>{ if(e.target===modal || e.target.closest('[data-close]')) closeModal(); });
   addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.hidden) closeModal(); });
