@@ -1336,6 +1336,12 @@ html,body{background:#2B3BFF!important}
 main{background:#fff;position:relative}
 .nav{background-color:rgba(43,59,255,.01)!important}
 @media (min-width:861px){.nav .wrap{padding-left:max(48px,env(safe-area-inset-left))!important;padding-right:max(48px,env(safe-area-inset-right))!important;max-width:none!important}}
+/* iOS 26 Safari: a fixed/sticky element touching the top edge makes Safari paint a SOLID bar in its colour.
+   On mobile the nav is a floating pill that starts below the status bar and is inset from the sides,
+   so Safari shows the page itself (blurred) behind its bars — edge to edge, like native apps. */
+@media (max-width:860px){
+  .nav{top:calc(env(safe-area-inset-top,0px) + 8px)!important;left:12px!important;right:12px!important;padding:0!important;background:none!important;background-color:transparent!important}
+}
 
 .hcapp{--stage: #e8ebff; --stage-ink: #0b0d17; --stage-ink-2: #4a4c5c; --stage-panel: #ffffff; --stage-line: #d6dbf5; --ground: #f3f4fc; --surface: #ffffff; --surface-2: #f0f2ff; --line: #e3e6f6; --ink: #0b0d17; --ink-2: #4a4c5c; --ink-3: #6e7085; --brand: #2b3bff; --ok: #15724a; --ok-soft: #e1f4ea; --warn: #c9440d; --warn-soft: #ffe3d6; --bad: #be2f22; --bad-soft: #fbe6e3; --info: #2b3bff; --info-soft: #e8ebff; --g1: #d9faf3; --g2: #b3f0e6; --g3: #9ae4f3; --g4: #86ccf5; --g5: #5aaef2; --logo-grad: linear-gradient(180deg,var(--g1) 0%,var(--g2) 30%,var(--g3) 55%,var(--g4) 78%,var(--g5) 100%); --card-grad: linear-gradient(118deg,#f4f5ff 0%,#e8ebff 45%,#dde1ff 100%); --font: Figtree,-apple-system,"SF Pro Text",system-ui,sans-serif; color-scheme: light; box-sizing: border-box; padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px);}
 
@@ -2558,7 +2564,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
 
 <script>
 /* Where sign-ups go. Paste your form endpoint here, e.g. "https://formspree.io/f/abcdwxyz". */
-console.info("Hypercard build v18");
+console.info("Hypercard build v19");
 const WAITLIST_ENDPOINT = "https://formsubmit.co/ajax/hello@hypercard.in";
 document.documentElement.classList.add('js');
 
