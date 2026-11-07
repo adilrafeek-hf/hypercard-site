@@ -1319,6 +1319,23 @@ body::before{display:none!important}
 .sec-i{align-items:center}
 .vp-sb .sb-r{color:#000;fill:#000}
 .vf-ic.ag{background:linear-gradient(145deg,#2b2f45,#0b0d17);color:#fff;border-radius:16px;box-shadow:0 8px 18px -8px rgba(11,13,23,.5)}
+/* desktop: equal columns, same-size visuals, alternating sides */
+@media (min-width:981px){
+  .feat,.vault-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:72px!important;align-items:center}
+  .feat>.vis,.vault-vis{width:100%;height:580px!important;min-height:0!important;padding:0!important;border-radius:32px;display:grid!important;place-items:center;overflow:hidden}
+  .vault-vis .vp{zoom:.8}
+  .feat>.vis .dev{zoom:.8!important}
+  /* order: One card text|vis · Vault vis|text · Just say text|vis · Stopped vis|text */
+  .vault-vis{order:-1}
+  .feat.alerts>.vis{order:2}
+  .feat.stopx>.vis{order:-1}
+}
+/* iOS 26 Safari tints its top/bottom bars from <body> background and from fixed elements:
+   make both resolve to Hypercard blue; page content keeps its own white */
+html,body{background:#2B3BFF!important}
+main{background:#fff;position:relative}
+.nav{background-color:rgba(43,59,255,.01)!important}
+@media (min-width:861px){.nav .wrap{padding-left:max(48px,env(safe-area-inset-left))!important;padding-right:max(48px,env(safe-area-inset-right))!important;max-width:none!important}}
 
 .hcapp{--stage: #e8ebff; --stage-ink: #0b0d17; --stage-ink-2: #4a4c5c; --stage-panel: #ffffff; --stage-line: #d6dbf5; --ground: #f3f4fc; --surface: #ffffff; --surface-2: #f0f2ff; --line: #e3e6f6; --ink: #0b0d17; --ink-2: #4a4c5c; --ink-3: #6e7085; --brand: #2b3bff; --ok: #15724a; --ok-soft: #e1f4ea; --warn: #c9440d; --warn-soft: #ffe3d6; --bad: #be2f22; --bad-soft: #fbe6e3; --info: #2b3bff; --info-soft: #e8ebff; --g1: #d9faf3; --g2: #b3f0e6; --g3: #9ae4f3; --g4: #86ccf5; --g5: #5aaef2; --logo-grad: linear-gradient(180deg,var(--g1) 0%,var(--g2) 30%,var(--g3) 55%,var(--g4) 78%,var(--g5) 100%); --card-grad: linear-gradient(118deg,#f4f5ff 0%,#e8ebff 45%,#dde1ff 100%); --font: Figtree,-apple-system,"SF Pro Text",system-ui,sans-serif; color-scheme: light; box-sizing: border-box; padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px);}
 
@@ -2407,7 +2424,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
     </div>
   </section>
 
-  <section class="wrap feat">
+  <section class="wrap feat stopx">
     <div>
       <div class="stat"><b>₹0</b><span>Charged when blocked</span></div>
       <h3>Stopped before you pay</h3>
@@ -2541,7 +2558,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
 
 <script>
 /* Where sign-ups go. Paste your form endpoint here, e.g. "https://formspree.io/f/abcdwxyz". */
-console.info("Hypercard build v15");
+console.info("Hypercard build v18");
 const WAITLIST_ENDPOINT = "https://formsubmit.co/ajax/hello@hypercard.in";
 document.documentElement.classList.add('js');
 
