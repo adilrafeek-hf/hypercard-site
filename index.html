@@ -2149,6 +2149,13 @@ html.modal-open{overflow:hidden}
   .chips label{min-height:36px;padding:0 13px;font-size:14px}
 }
 @keyframes sheetUp{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+/* never wider than the screen; no sideways panning */
+.modal{grid-template-columns:minmax(0,1fr);overflow:hidden;touch-action:pan-y}
+.sheet{min-width:0;box-sizing:border-box;overflow-x:hidden;touch-action:pan-y}
+.sheet *{min-width:0;max-width:100%}
+.sheet .row2>*{min-width:0}
+html.modal-open,html.modal-open body{overflow:hidden!important;overscroll-behavior:none;touch-action:pan-y}
+@media (max-width:600px){.sheet{width:100%;max-width:100vw}}
 
 .muted{color:var(--ink-2)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -2593,7 +2600,7 @@ addEventListener('DOMContentLoaded',()=>{const nav=document.getElementById('nav'
 
 <script>
 /* Where sign-ups go. Paste your form endpoint here, e.g. "https://formspree.io/f/abcdwxyz". */
-console.info("Hypercard build v28");
+console.info("Hypercard build v30");
 const WAITLIST_ENDPOINT = "https://script.google.com/macros/s/AKfycbzRd7yCEK_nnq7UfNyHJfPdPGVLdu8LNbHpELpIhvZqun_BPtw_s6IwqJy1wCWu1qeeIw/exec";
 document.documentElement.classList.add('js');
 
@@ -2695,7 +2702,6 @@ document.documentElement.classList.add('js');
   const AGENTS = ["Instinct","Muse","Hermes","ChatGPT","Claude","Gemini","Perplexity","Other"];
   const sel = $('country');
   let guess = 'IN';
-  try { const r=(navigator.language||'').split('-')[1]; if (r && COUNTRIES.some(c=>c[0]===r.toUpperCase())) guess=r.toUpperCase(); } catch(e){}
   const opt=(c,n)=>{const o=document.createElement('option');o.value=c;o.textContent=n;return o;};
   sel.append(opt('IN','India'));
   const sep=document.createElement('option'); sep.disabled=true; sep.textContent='──────────'; sel.append(sep);
